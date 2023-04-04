@@ -15,7 +15,7 @@ object DeTestApp extends App {
   val spark = SparkSession.builder()
     .master("local[*]")
     .appName("de_test")
-    .getOrCreate();
+    .getOrCreate()
 
   import spark.implicits._
 
@@ -96,6 +96,13 @@ object DeTestApp extends App {
           .select('org_inn, 'channel)
           .join(aggDbInfoDF, Seq("org_inn"), "inner")
           .join(productNamesDF, Seq("product_name_hash"), "inner")
+          .groupBy("brand", groupCols: _*)
+          .agg(sum('total_sum).as("total_sum"))
+
+      case (true, false) =>
+        aggDbInfoDF
+          .join(productNamesDF, Seq("product_name_hash"), "inner")
+          .filter('kkt_category === kktCategory)
           .groupBy("brand", groupCols: _*)
           .agg(sum('total_sum).as("total_sum"))
 
