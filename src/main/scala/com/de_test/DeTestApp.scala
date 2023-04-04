@@ -11,7 +11,6 @@ object DeTestApp extends App {
 
   val dateFrom = appParams.dateFrom
   val dateTo = appParams.dateTo
-  val productNamesPath = appParams.productNamesPath
 
   val spark = SparkSession.builder()
     .master("local[*]")
@@ -33,7 +32,7 @@ object DeTestApp extends App {
   val productNamesDF = spark
     .read
     .option("header", true)
-    .csv("./src/main/resources/product_names.csv")
+    .csv(appParams.productNamesPath)
 
   val window = Window
     .partitionBy("kkt_number")
