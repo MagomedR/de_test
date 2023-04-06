@@ -42,7 +42,11 @@ object DeTestApp extends App {
     .read
     .format("jdbc")
     .options(
-      Map("driver" -> "org.sqlite.JDBC", "dbtable" -> sqlQuery, "url" -> "jdbc:sqlite:./src/main/resources/de_test.db")
+      Map(
+        "driver" -> "org.sqlite.JDBC",
+        "dbtable" -> sqlQuery,
+        "url" -> "jdbc:sqlite:./src/main/resources/de_test.db"
+      )
     )
     .load()
     .withColumn("is_active_kkt",
@@ -52,7 +56,11 @@ object DeTestApp extends App {
     .withColumn("rn", row_number().over(window))
     .filter('is_active_kkt === 1 and 'rn === 1)
 
-  val interDF = doProcess(appParams, productNamesDF, aggDbInfoDF).cache()
+  val interDF = doProcess(
+    appParams,
+    productNamesDF,
+    aggDbInfoDF
+  ).cache()
 
   val allTotalSum = interDF
     .select(sum('total_sum))
