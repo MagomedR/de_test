@@ -38,7 +38,9 @@ object DeTestApp extends App {
     .partitionBy("kkt_number")
     .orderBy(desc("version"))
 
-  val aggDbInfoDF = spark.read.format("jdbc")
+  val aggDbInfoDF = spark
+    .read
+    .format("jdbc")
     .options(
       Map("driver" -> "org.sqlite.JDBC", "dbtable" -> sqlQuery, "url" -> "jdbc:sqlite:./src/main/resources/de_test.db")
     )
@@ -52,11 +54,13 @@ object DeTestApp extends App {
 
   val interDF = doProcess(appParams, productNamesDF, aggDbInfoDF).cache()
 
-  val all_total_summ = interDF
-    .select(sum('total_sum)).first.getLong(0)
+  val allTotalSum = interDF
+    .select(sum('total_sum))
+    .first
+    .getLong(0)
 
   interDF
-    .withColumn("total_sum_pct", lit('total_sum / all_total_summ).cast(DecimalType(10, 2)))
+    .withColumn("total_sum_pct", lit('total_sum / allTotalSum).cast(DecimalType(10, 2)))
     .repartition(1)
     .write
     .option("header", true)
